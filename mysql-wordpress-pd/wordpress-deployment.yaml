@@ -1,3 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  labels:
+    app.kubernetes.io/name: argocd-server
+    app.kubernetes.io/part-of: argocd
+  name: cds-argocd-server
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: wordpress.cariad.demo.hypercube.services
+      http:
+        paths:
+          - backend:
+              service:
+                name: wordpress
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - wordpress.cariad.demo.hypercube.services
+---
 apiVersion: v1
 kind: Service
 metadata:
@@ -10,7 +37,7 @@ spec:
   selector:
     app: wordpress
     tier: frontend
-  type: LoadBalancer
+  type: ClusterIP
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
